@@ -95,7 +95,7 @@ M.delete = function()
     return
   end
   local path = vim.b.filittle_dir .. name
-  if fn.isdirectory(path) then
+  if fn.isdirectory(path) == 1 then
     local flag = conf == 1 and "d" or "rf"
     if fn.delete(path, flag) == -1 then
       M.errmsg("Delete directory failed")

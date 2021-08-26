@@ -11,7 +11,7 @@ local sort = function(base, objs, devicon)
     elseif type == "file" then
       files[#files + 1] = v
     elseif type == "link" then
-      if fn.isdirectory(fn.resolve(path)) then
+      if fn.isdirectory(fn.resolve(path)) == 1 then
         dirs[#dirs + 1] = v .. "/"
       elseif fn.filereadable(fn.resolve(path)) then
         files[#files + 1] = v
@@ -77,7 +77,7 @@ M.init = function()
   vim.bo.buflisted = false
   vim.wo.wrap = false
 
-  if fn.exists("#NvimWebDevicons") then
+  if vim.g.nvim_web_devicons then
     vim.b.filittle_devicon = true
   end
 
