@@ -1,7 +1,7 @@
 local M = {}
 local fn, api = vim.fn, vim.api
 
-local sort = function(base, objs)
+local sort = function(base, objs, devicon)
   local dirs, files = {}, {}
   for _, v in ipairs(objs) do
     local path = base .. v
@@ -18,6 +18,31 @@ local sort = function(base, objs)
       end
     end
   end
+  if not (vim.b.filittle_show_hidden or vim.g.filittle_show_hidden) then
+    dirs = vim.tbl_filter(function(dir)
+      return string.match(dir, "^[^%.]") and true or false
+    end, dirs)
+    files = vim.tbl_filter(function(file)
+      return string.match(file, "^[^%.]") and true or false
+    end, files)
+  end
+
+  vim.cmd([[syntax match filittleDir '^.\+/$']])
+  vim.cmd("highlight link filittleDir Directory")
+  if devicon then
+    for i, v in ipairs(dirs) do
+      dirs[i] = " " .. v
+    end
+    local dev = require("nvim-web-devicons")
+    for i, v in ipairs(files) do
+      local icon, hlname = dev.get_icon(v, fn.fnamemodify(v, ":e"), { default = true })
+      files[i] = icon .. " " .. v
+      vim.cmd("syntax keyword filittle" .. hlname .. " " .. icon)
+      vim.cmd("highlight link filittle" .. hlname .. " " .. hlname)
+    end
+  end
+  vim.b.current_syntax = "filittle"
+
   for _, v in ipairs(files) do
     dirs[#dirs + 1] = v
   end
@@ -43,6 +68,7 @@ M.init = function()
   elseif not string.match(path, "/$") then
     path = path .. "/"
   end
+
   vim.b.filittle_dir = path
   vim.bo.modifiable = true
   vim.bo.filetype = "filittle"
@@ -50,18 +76,17 @@ M.init = function()
   vim.bo.bufhidden = "unload"
   vim.bo.buflisted = false
   vim.wo.wrap = false
-  vim.wo.cursorline = true
-  local objs = sort(path, fn.readdir(path, 1))
-  if not (vim.b.filittle_show_hidden or vim.g.filittle_show_hidden) then
-    objs = vim.tbl_filter(function(obj)
-      return string.match(obj, "^[^%.]") and true or false
-    end, objs)
+
+  if fn.exists("#NvimWebDevicons") then
+    vim.b.filittle_devicon = true
   end
+
+  local objs = sort(path, fn.readdir(path, 1), vim.b.filittle_devicon)
   api.nvim_buf_set_lines(0, 0, -1, true, objs)
   vim.bo.modifiable = false
 
   local map = vim.api.nvim_buf_set_keymap
-  local opt = { noremap = true }
+  local opt = { noremap = true, nowait = true }
   for rhs, v in pairs(defaults) do
     v = type(v) == "string" and { v } or v
     for _, lhs in ipairs(v) do
