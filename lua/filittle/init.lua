@@ -24,6 +24,20 @@ local sort = function(base, objs)
   return dirs
 end
 
+local defaults = {
+  mappings = {
+    open = { "<cr>", "l", "o" },
+    reload = "R",
+    up = "h",
+    home = "~",
+    toggle_hidden = "+",
+    newdir = "nd",
+    newfile = "nf",
+    delete = "d",
+    rename = "r",
+  },
+}
+
 M.init = function()
   local path = fn.resolve(fn.expand("%:p"))
   if fn.isdirectory(path) == 0 then
@@ -47,6 +61,30 @@ M.init = function()
   end
   api.nvim_buf_set_lines(0, 0, -1, true, objs)
   vim.bo.modifiable = false
+
+  local map = vim.api.nvim_buf_set_keymap
+  local opt = { noremap = true }
+  for k, v in pairs(defaults.mappings) do
+    v = type(v) == "string" and { v } or v
+    for _, lhs in ipairs(v) do
+      map(0, lhs, '<cmd>lua require("filittle.operator").' .. k .. "()<cr>", opt)
+    end
+  end
+end
+
+M.setup = function(opts)
+  opts = opts or {}
+  opts.mappings = opts.mappings or {}
+  for k, v in pairs(opts.mappings) do
+    defaults.mappings[k] = v
+  end
+  vim.cmd([[
+au! FileExplorer *
+augroup _filettle_
+  au!
+  au BufEnter * lua require("filittle").init()
+augroup END
+]])
 end
 
 return M
