@@ -1,6 +1,6 @@
 # filittle.nvim
 
-Simple and small filer for neovim written in Lua (optional support for devicons).
+A simple and small file explorer for neovim written in Lua (optional support for devicons).
 
 Inspired by [vim-molder](https://github.com/mattn/vim-molder)
 

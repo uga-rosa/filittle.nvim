@@ -5,7 +5,7 @@ local cword = function()
   local line = fn.getline(".")
   local idx = vim.b.filittle_devicon and vim.str_byteindex(line, 1) + 2 or 1
   local name = string.sub(line, idx)
-  return string.match(name, "^(.*)/$") or name
+  return fn.fnameescape(string.match(name, "^(.-)/?$"))
 end
 
 M.open = function()
@@ -17,17 +17,15 @@ M.reload = function()
 end
 
 M.up = function()
-  local path = fn.fnamemodify(vim.b.filittle_dir, ":h:h")
-  local name = fn.fnamemodify(vim.b.filittle_dir, ":h:t")
+  local path = string.match(vim.b.filittle_dir, "^(.*)/$")
+  local name = fn.fnamemodify(path, ":t")
   if name == "" then
     return
   end
-  vim.cmd("e " .. path)
-  if fn.exists("#NvimWebDevicons") then
-    fn.search([[\v^ \V]] .. name .. [[/\v$]], "c")
-  else
-    fn.search([[\v^\V]] .. name .. [[/\v$]], "c")
-  end
+  path = fn.fnamemodify(vim.b.filittle_dir, ":p:h:h")
+  vim.cmd("e " .. fn.fnameescape(path))
+  local icon = vim.b.filittle_devicon and " " or ""
+  fn.search([[\v^\V]] .. icon .. name .. [[/\v$]], "c")
 end
 
 M.home = function()
@@ -46,21 +44,12 @@ M.errmsg = function(msg)
   vim.cmd("echohl None")
 end
 
-local inarr = function(str, arr)
-  for _, v in ipairs(arr) do
-    if str == v then
-      return true
-    end
-  end
-  return false
-end
-
 M.newdir = function()
   local name = fn.input("Create directory: ")
   if not name or name == "" then
     return
   end
-  if inarr(name, { ".", "..", "/", "\\" }) then
+  if vim.tbl_contains({ ".", "..", "/", "\\" }, name) then
     M.errmsg("Invalid directory name: " .. name)
     return
   end
@@ -76,7 +65,7 @@ M.newfile = function()
   if not name or name == "" then
     return
   end
-  if inarr(name, { ".", "..", "/", "\\" }) then
+  if vim.tbl_contains({ ".", "..", "/", "\\" }, name) then
     M.errmsg("Invalid file name: " .. name)
     return
   end
@@ -113,9 +102,9 @@ end
 M.rename = function()
   local old = cword()
   local new = fn.input("Rename: ", old)
-  if inarr(new, { "", old }) then
+  if vim.tbl_contains({ "", old }, new) then
     return
-  elseif inarr(new, { ".", "..", "/", "\\" }) then
+  elseif vim.tbl_contains({ ".", "..", "/", "\\" }, new) then
     M.errmsg("Invalid name: " .. new)
     return
   end

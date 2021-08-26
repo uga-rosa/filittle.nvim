@@ -18,6 +18,7 @@ local sort = function(base, objs, devicon)
       end
     end
   end
+
   if not (vim.b.filittle_show_hidden or vim.g.filittle_show_hidden) then
     dirs = vim.tbl_filter(function(dir)
       return string.match(dir, "^[^%.]") and true or false
@@ -30,9 +31,9 @@ local sort = function(base, objs, devicon)
   vim.cmd([[syntax match filittleDir '^.\+/$']])
   vim.cmd("highlight link filittleDir Directory")
   if devicon then
-    for i, v in ipairs(dirs) do
-      dirs[i] = " " .. v
-    end
+    dirs = vim.tbl_map(function(dir)
+      return " " .. dir
+    end, dirs)
     local dev = require("nvim-web-devicons")
     for i, v in ipairs(files) do
       local icon, hlname = dev.get_icon(v, fn.fnamemodify(v, ":e"), { default = true })
