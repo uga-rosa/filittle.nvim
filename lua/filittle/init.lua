@@ -25,17 +25,15 @@ local sort = function(base, objs)
 end
 
 local defaults = {
-  mappings = {
-    open = { "<cr>", "l", "o" },
-    reload = "R",
-    up = "h",
-    home = "~",
-    toggle_hidden = "+",
-    newdir = "nd",
-    newfile = "nf",
-    delete = "d",
-    rename = "r",
-  },
+  open = { "<cr>", "l", "o" },
+  reload = "R",
+  up = "h",
+  home = "~",
+  toggle_hidden = "+",
+  newdir = "nd",
+  newfile = "nf",
+  delete = "d",
+  rename = "r",
 }
 
 M.init = function()
@@ -64,24 +62,26 @@ M.init = function()
 
   local map = vim.api.nvim_buf_set_keymap
   local opt = { noremap = true }
-  for k, v in pairs(defaults.mappings) do
+  for rhs, v in pairs(defaults) do
     v = type(v) == "string" and { v } or v
     for _, lhs in ipairs(v) do
-      map(0, lhs, '<cmd>lua require("filittle.operator").' .. k .. "()<cr>", opt)
+      map(0, "n", lhs, '<cmd>lua require("filittle.operator").' .. rhs .. "()<cr>", opt)
     end
   end
 end
 
-M.setup = function(opts)
-  opts = opts or {}
-  opts.mappings = opts.mappings or {}
-  for k, v in pairs(opts.mappings) do
-    defaults.mappings[k] = v
+M.shutup_netrw = function()
+  if fn.exists("#FileExplorer") then
+    vim.cmd([[au! FileExplorer *]])
   end
+end
+
+M.setup = function(mappings)
+  defaults = mappings or defaults
   vim.cmd([[
-au! FileExplorer *
-augroup _filettle_
+augroup filittle
   au!
+  au VimEnter * lua require("filittle").shutup_netrw()
   au BufEnter * lua require("filittle").init()
 augroup END
 ]])
