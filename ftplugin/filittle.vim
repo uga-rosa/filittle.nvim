@@ -3,9 +3,6 @@ nnoremap <Plug>(filittle-reload)        <cmd>lua require("filittle.operator").re
 nnoremap <Plug>(filittle-up)            <cmd>lua require("filittle.operator").up()<cr>
 nnoremap <Plug>(filittle-toggle_hidden) <cmd>lua require("filittle.operator").toggle_hidden()<cr>
 nnoremap <Plug>(filittle-newdir)        <cmd>lua require("filittle.operator").newdir()<cr>
-
-nmap <buffer><nowait> <cr> <Plug>(filittle-open)
-nmap <buffer><nowait> R    <Plug>(filittle-reload)
-nmap <buffer><nowait> h    <Plug>(filittle-up)
-nmap <buffer><nowait> +    <Plug>(filittle-toggle_hidden)
-nmap <buffer><nowait> nd   <Plug>(filittle-newdir)
+nnoremap <Plug>(filittle-newfile)       <cmd>lua require("filittle.operator").newfile()<cr>
+nnoremap <Plug>(filittle-delete)        <cmd>lua require("filittle.operator").delete()<cr>
+nnoremap <Plug>(filittle-rename)        <cmd>lua require("filittle.operator").rename()<cr>
