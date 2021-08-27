@@ -17,12 +17,12 @@ M.reload = function()
 end
 
 M.up = function()
-  local path = string.match(vim.b.filittle_dir, "^(.*)/$")
-  local name = fn.fnamemodify(path, ":t")
-  if name == "" then
+  local dir = vim.b.filittle_dir
+  if dir == "/" then
     return
   end
-  path = fn.fnamemodify(vim.b.filittle_dir, ":p:h:h")
+  local path, name = dir:match("^(.*)/(.-)/$")
+  path = path == "" and "/" or path
   vim.cmd("e " .. fn.fnameescape(path))
   local icon = vim.b.filittle_devicon and " " or ""
   fn.search([[\v^\V]] .. icon .. name .. [[/\v$]], "c")
@@ -49,14 +49,7 @@ M.newdir = function()
   if not name or name == "" then
     return
   end
-  if vim.tbl_contains({ ".", "..", "/", "\\" }, name) then
-    M.errmsg("Invalid directory name: " .. name)
-    return
-  end
-  if vim.fn.mkdir(vim.b.filittle_dir .. name) == 0 then
-    M.errmsg("Create directory failed")
-    return
-  end
+  vim.loop.fs_mkdir(vim.b.filittle_dir .. name, 2434)
   M.reload()
 end
 
@@ -65,15 +58,8 @@ M.newfile = function()
   if not name or name == "" then
     return
   end
-  if vim.tbl_contains({ ".", "..", "/", "\\" }, name) then
-    M.errmsg("Invalid file name: " .. name)
-    return
-  end
-  local res, _ = os.execute("touch " .. vim.b.filittle_dir .. name)
-  if not res then
-    M.errmsg("Create file failed")
-    return
-  end
+  local file = vim.loop.fs_open(vim.b.filittle_dir .. name, "w", 2434)
+  vim.loop.fs_close(file)
   M.reload()
 end
 

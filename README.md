@@ -2,6 +2,8 @@
 
 A simple and small file explorer for neovim written in Lua (optional support for devicons).
 
+This disables and replaces the default file explorer (netrw).
+
 Inspired by [vim-molder](https://github.com/mattn/vim-molder)
 
 ## Required
@@ -30,7 +32,7 @@ lua require("filittle").setup()
 - `home`: Move to home directory (like `cd ~`).
 - `toggle_hidden`: Toggles the display of hidden files.
 - `newdir`: Create a new directory.
-- `newfile`: Create a new file (depends on `touch`).
+- `newfile`: Create a new file.
 - `delete`: Delete a file or directory
 - `rename`: Rename a file or directory
 
