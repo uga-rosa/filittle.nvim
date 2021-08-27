@@ -1,5 +1,7 @@
 # filittle.nvim
 
+\* Under development.
+
 A simple and small file explorer for neovim written in Lua (optional support for devicons).
 
 This disables and replaces the default file explorer (netrw).

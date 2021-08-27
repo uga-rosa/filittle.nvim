@@ -24,7 +24,6 @@ M.up = function()
   end
   local path, name = dir:match("^(.*)/(.-)/$")
   path = path == "" and "/" or path
-  print(path)
   vim.cmd("e " .. fn.fnameescape(path))
   local icon = vim.b.filittle_devicon and " " or ""
   fn.search([[\v^\V]] .. icon .. name .. [[/\v$]], "c")
