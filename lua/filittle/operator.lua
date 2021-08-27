@@ -1,5 +1,7 @@
 local M = {}
 local fn = vim.fn
+local uv = vim.loop
+local dir = vim.b.filittle_dir
 
 local cword = function()
   local line = fn.getline(".")
@@ -9,7 +11,7 @@ local cword = function()
 end
 
 M.open = function()
-  vim.cmd("e " .. vim.b.filittle_dir .. cword())
+  vim.cmd("e " .. dir .. cword())
 end
 
 M.reload = function()
@@ -17,12 +19,12 @@ M.reload = function()
 end
 
 M.up = function()
-  local dir = vim.b.filittle_dir
   if dir == "/" then
     return
   end
   local path, name = dir:match("^(.*)/(.-)/$")
   path = path == "" and "/" or path
+  print(path)
   vim.cmd("e " .. fn.fnameescape(path))
   local icon = vim.b.filittle_devicon and " " or ""
   fn.search([[\v^\V]] .. icon .. name .. [[/\v$]], "c")
@@ -37,19 +39,20 @@ M.toggle_hidden = function()
   M.reload()
 end
 
-M.errmsg = function(msg)
-  vim.cmd("redraw")
-  vim.cmd("echohl Error")
-  print(msg)
-  vim.cmd("echohl None")
-end
+local errmsg = vim.schedule_wrap(function(err, _)
+  if err then
+    vim.api.nvim_command("echohl ErrorMsg")
+    vim.api.nvim_command("echomsg '" .. err .. "'")
+    vim.api.nvim_command("echohl None")
+  end
+end)
 
 M.newdir = function()
   local name = fn.input("Create directory: ")
   if not name or name == "" then
     return
   end
-  vim.loop.fs_mkdir(vim.b.filittle_dir .. name, 2434)
+  uv.fs_mkdir(dir .. name, 2434, errmsg)
   M.reload()
 end
 
@@ -58,8 +61,8 @@ M.newfile = function()
   if not name or name == "" then
     return
   end
-  local file = vim.loop.fs_open(vim.b.filittle_dir .. name, "w", 2434)
-  vim.loop.fs_close(file)
+  local file = uv.fs_open(dir .. name, "w", 2434, errmsg)
+  uv.fs_close(file, errmsg)
   M.reload()
 end
 
@@ -69,18 +72,13 @@ M.delete = function()
   if conf == 2 then
     return
   end
-  local path = vim.b.filittle_dir .. name
+  local path = dir .. name
   if fn.isdirectory(path) == 1 then
-    local flag = conf == 1 and "d" or "rf"
-    if fn.delete(path, flag) == -1 then
-      M.errmsg("Delete directory failed")
-      return
+    if conf == 1 then
+      uv.fs_rmdir(path, errmsg)
     end
   else
-    if fn.delete(path) == -1 then
-      M.errmsg("Delete file failed")
-      return
-    end
+    uv.fs_unlink(path, errmsg)
   end
   M.reload()
 end
@@ -90,15 +88,8 @@ M.rename = function()
   local new = fn.input("Rename: ", old)
   if vim.tbl_contains({ "", old }, new) then
     return
-  elseif vim.tbl_contains({ ".", "..", "/", "\\" }, new) then
-    M.errmsg("Invalid name: " .. new)
-    return
   end
-  local path = vim.b.filittle_dir
-  if fn.rename(path .. old, path .. new) ~= 0 then
-    M.errmsg("Rename failed")
-    return
-  end
+  uv.fs_rename(dir .. old, dir .. new, errmsg)
   M.reload()
 end
 
