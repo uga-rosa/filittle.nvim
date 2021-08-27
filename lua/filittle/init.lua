@@ -7,17 +7,23 @@ local sort = function(base, objs, devicon)
     local path = base .. v
     local type = fn.getftype(path)
     if type == "dir" then
-      dirs[#dirs + 1] = v .. "/"
+      v = v .. "/"
+      dirs[#dirs + 1] = v
+      vim.cmd("syntax keyword filittleDir " .. v)
     elseif type == "file" then
       files[#files + 1] = v
     elseif type == "link" then
       if fn.isdirectory(fn.resolve(path)) == 1 then
-        dirs[#dirs + 1] = v .. "/"
+        v = v .. "/"
+        dirs[#dirs + 1] = v
       elseif fn.filereadable(fn.resolve(path)) then
         files[#files + 1] = v
       end
+      vim.cmd("syntax keyword filittleLink " .. v)
     end
   end
+  vim.cmd("highlight link filittleDir NightflyBlue")
+  vim.cmd("highlight link filittleLink NightflyTurquoise")
 
   if not (vim.b.filittle_show_hidden or vim.g.filittle_show_hidden) then
     dirs = vim.tbl_filter(function(dir)
@@ -28,9 +34,9 @@ local sort = function(base, objs, devicon)
     end, files)
   end
 
-  vim.cmd([[syntax match filittleDir '^.\+/$']])
-  vim.cmd("highlight link filittleDir Directory")
   if devicon then
+    vim.cmd("syntax keyword filittleDirIcon ")
+    vim.cmd("highlight link filittleDirIcon NightflyBlue")
     dirs = vim.tbl_map(function(dir)
       return " " .. dir
     end, dirs)
@@ -38,8 +44,7 @@ local sort = function(base, objs, devicon)
     for i, v in ipairs(files) do
       local icon, hlname = dev.get_icon(v, fn.fnamemodify(v, ":e"), { default = true })
       files[i] = icon .. " " .. v
-      vim.cmd("syntax keyword filittle" .. hlname .. " " .. icon)
-      vim.cmd("highlight link filittle" .. hlname .. " " .. hlname)
+      vim.cmd("syntax keyword " .. hlname .. " " .. icon)
     end
   end
   vim.b.current_syntax = "filittle"
@@ -71,12 +76,13 @@ M.init = function()
   end
 
   vim.b.filittle_dir = path
-  vim.bo.modifiable = true
-  vim.bo.filetype = "filittle"
-  vim.bo.buftype = "nofile"
-  vim.bo.bufhidden = "unload"
-  vim.bo.buflisted = false
-  vim.wo.wrap = false
+  vim.opt_local.modifiable = true
+  vim.opt_local.filetype = "filittle"
+  vim.opt_local.buftype = "nofile"
+  vim.opt_local.bufhidden = "unload"
+  vim.opt_local.buflisted = false
+  vim.opt_local.wrap = false
+  vim.opt_local.iskeyword:append({ ".", "/" })
 
   if vim.g.nvim_web_devicons then
     vim.b.filittle_devicon = true
