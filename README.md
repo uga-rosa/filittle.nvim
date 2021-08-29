@@ -1,22 +1,15 @@
 # filittle.nvim
 
-\* Under development.
+\* alpha version
 
-A simple and small file explorer for neovim written in Lua (optional support for devicons).
+A simple and fast file explorer for neovim written in Lua (optional support for devicons).
 
 This disables and replaces the default file explorer (netrw).
-
-Inspired by [vim-molder](https://github.com/mattn/vim-molder)
 
 ## Required
 
 - neovim 0.5+
-- Linux (It probably works on macOS, but without check)
 - [nvim-web-devicons](https://github.com/kyazdani42/nvim-web-devicons) (optional)
-
-If you want to use devicon, all you need to do is installing it.
-
-I don't use it on Windows, so I don't plan to deal with it myself.
 
 ## Setup
 

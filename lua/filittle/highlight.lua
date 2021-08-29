@@ -1,30 +1,23 @@
 local M = {}
 
 local api = vim.api
-local Devicons = require("nvim-web-devicons")
-local ICON_WIDTH = #Devicons.get_icon("", "", { default = true })
 
-local ns = api.nvim_create_namespace("filettle")
+M.init = function(paths, devicons)
+  local ns = api.nvim_create_namespace("filittle")
+  api.nvim_buf_clear_namespace(0, ns, 0, -1)
 
-M.init = function(names, hlnames, devicons)
-  api.nvim_buf_clear_namespace(0, ns, 1, -1)
   if devicons then
-    for i, path in ipairs(names) do
-      if path:is_dir() then
-        local hlname = hlnames[i]
-        api.nvim_buf_add_highlight(0, ns, hlname, i - 1, 1, -1)
-      elseif path:is_file() then
-        local hlname = hlnames[i]
-        api.nvim_buf_add_highlight(0, ns, hlname, i - 1, 1, ICON_WIDTH)
-      else
-      end
+    local ICON_WIDTH = #require("nvim-web-devicons").get_icon("", "", { default = true })
+    for i, path in ipairs(paths) do
+      local col_end = path:is_dir() and -1 or ICON_WIDTH
+      api.nvim_buf_add_highlight(0, ns, path.hlname, i - 1, 0, col_end)
     end
   else
-    vim.cmd("highlight FilittleDir guifg=#82aaff")
     local hlname = "FilittleDir"
-    for i, name in ipairs(names) do
-      if vim.endswith(name, "/") then
-        api.nvim_buf_add_highlight(0, ns, hlname, i - 1, 1, -1)
+    vim.cmd(string.format("highlight %s guifg=#82aaff", hlname))
+    for i, path in ipairs(paths) do
+      if path:is_dir() then
+        api.nvim_buf_add_highlight(0, ns, hlname, i - 1, 0, -1)
       end
     end
   end
