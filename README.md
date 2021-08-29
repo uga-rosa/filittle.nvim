@@ -21,6 +21,7 @@ Of cource, you can also use `<C-o>` and `<C-i>` to jump.
 Option to set it up.
 - devicons: boolen (whether to enable nvim-web-devicons)
 - mappings: table (key: lhs, value: a built-in function or a function defined by you)
+
 The built-in function can be specified as a string. [See here](#buitlin-function)
 
 Exanple
@@ -60,7 +61,7 @@ require("filittle").setup({
 - `delete`: Delete a file or directory
 - `rename`: Rename a file or directory
 
-## Options
+## Global options
 
 - Always show hidden files.
 
