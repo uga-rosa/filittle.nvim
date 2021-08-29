@@ -5,6 +5,9 @@ local api = vim.api
 local action = require("filittle.action")
 local builtin = {
   open = action.open,
+  split = action.split,
+  vsplit = action.vsplit,
+  tabedit = action.tabedit,
   reload = action.reload,
   up = action.up,
   home = action.home,
@@ -15,28 +18,32 @@ local builtin = {
   rename = action.rename,
 }
 
-local lua2rhs = function(func, paths, dev)
+local lua2rhs = function(func, paths)
   local idx = #_G._filittle_ + 1
   if type(func) == "string" then
     if builtin[func] then
       _G._filittle_[idx] = function()
-        builtin[func](paths, dev)
+        builtin[func](paths)
       end
     else
       print("This is NOT builtin function: " .. func)
+      return
     end
   else
     _G._filittle_[idx] = function()
-      func(paths, dev)
+      func(paths)
     end
   end
   return string.format("<cmd>lua _G._filittle_[%d]()<cr>", idx)
 end
 
 M.init = function(paths, settings)
-  local dev, map = settings.devicons, settings.mappings
+  local map = settings.mappings
   for lhs, func in pairs(map) do
-    api.nvim_buf_set_keymap(0, "n", lhs, lua2rhs(func, paths, dev), { noremap = true })
+    local rhs = lua2rhs(func, paths)
+    if rhs then
+      api.nvim_buf_set_keymap(0, "n", lhs, rhs, { noremap = true, nowait = true })
+    end
   end
 end
 

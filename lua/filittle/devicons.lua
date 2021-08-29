@@ -28,6 +28,7 @@ M.init = function(paths)
       path.hlname = hlname
     end
   end
+  paths.icon = Devicons.get_icon("filittle_dir", "") .. " "
   return paths
 end
 

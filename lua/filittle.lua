@@ -1,7 +1,10 @@
 local M = {}
+
 local fn, api = vim.fn, vim.api
+
 local hl = require("filittle.highlight")
 local devicons = require("filittle.devicons")
+local mapping = require("filittle.mapping")
 
 local settings = {
   devicons = false,
@@ -15,10 +18,13 @@ end
 M.init = function()
   local Path = require("plenary.path")
   local scan = require("plenary.scandir")
+
   local cwd = Path:new(fn.expand("%"))
   if not cwd:is_dir() then
     return
   end
+  cwd.filename = cwd:absolute()
+
   if vim.bo.buftype ~= "" and vim.b.prev_filetype ~= "filittle" then
     return
   end
@@ -50,6 +56,7 @@ M.init = function()
 
   table.sort(paths, sort)
 
+  paths.icon = ""
   if settings.devicons then
     paths = devicons.init(paths)
   end
@@ -64,7 +71,8 @@ M.init = function()
   vim.bo.modifiable = false
 
   paths.cwd = cwd
-  require("filittle.mapping").init(paths, settings)
+  paths.devicons = settings.devicons
+  mapping.init(paths, settings)
 end
 
 M.shutup_netrw = function()
