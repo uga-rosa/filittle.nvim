@@ -20,7 +20,7 @@ M.init = function()
   local scan = require("plenary.scandir")
 
   local cwd = Path:new(fn.expand("%"))
-  if not cwd:is_dir() then
+  if not cwd:is_dir() or fn.bufname() == "" then
     return
   end
   cwd.filename = cwd:absolute()
