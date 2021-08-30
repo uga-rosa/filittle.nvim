@@ -25,14 +25,13 @@ end
 
 M.up = function(paths)
   local cwd = paths.cwd
-  if cwd.filename == cwd.path.root() then
+  if cwd._absolute == cwd.path.root() then
     return
   end
-  local parent = cwd:parent()
-  parent.filename = parent:absolute()
-  local old = cwd:make_relative(parent.filename)
-  vim.cmd("e " .. parent.filename)
-  if parent.filename == cwd.path.root() then
+  local parent = cwd:parent():absolute()
+  local old = cwd:_name()
+  vim.cmd("e " .. parent)
+  if parent == cwd.path.root() then
     vim.cmd("do BufEnter")
   end
   fn.search([[\v^\V]] .. paths.diricon .. old .. [[/\v$]], "c")
@@ -58,15 +57,13 @@ end
 
 M.touch = function(paths)
   local name = fn.input("Create file: ")
-  local cwd = paths.cwd
-  cwd:joinpath(name):touch()
+  paths.cwd:joinpath(name):touch()
   M.reload()
 end
 
 M.mkdir = function(paths)
   local name = fn.input("Create directory: ")
-  local cwd = paths.cwd
-  cwd:joinpath(name):mkdir()
+  paths.cwd:joinpath(name):mkdir()
   M.reload()
 end
 
@@ -76,14 +73,14 @@ M.delete = function(paths)
   if conf == 2 then
     return
   end
-  path:rm(path:is_dir() and { recursive = true } or {})
+  path:_rm(path:is_dir() and { recursive = true } or {})
   M.reload()
 end
 
 M.rename = function(paths)
   local old = paths[fn.line(".")]
-  local new = fn.input("Rename: ", old.filename)
-  old:rename({ new_name = paths.cwd:joinpath(new):absolute() })
+  local new = fn.input("Rename: ", old:_name())
+  old:_rename({ new_name = new })
   M.reload()
 end
 

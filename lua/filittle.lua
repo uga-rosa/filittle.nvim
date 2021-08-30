@@ -27,21 +27,47 @@ M.init = function()
   local scan = require("plenary.scandir")
 
   function Path:_name()
-    return self:make_relative(self:parent().filename)
+    return self.filename:match(("([^%s]+)%s?$"):format(self._sep, self._sep))
   end
 
   function Path:is_link()
-    local res = uv.fs_lstat(self._unresolved)
+    local res = uv.fs_lstat(self.filename)
     if res then
       return res.type == "link"
     end
   end
 
+  function Path:_rm(opts)
+    if self:is_link() then
+      uv.fs_unlink(self.filename)
+    else
+      self:rm(opts)
+    end
+  end
+
+  function Path:_rename(opts)
+    opts = opts or {}
+    if not opts.new_name or opts.new_name == "" then
+      error("Please provide the new name!")
+    end
+    if opts.new_name:match("^%.%.?/?\\?") then
+      error("Invalid file name: " .. opts.new_name)
+    end
+    local new_path = Path:new(opts.new_name)
+    if not new_path:is_absolute() then
+      new_path.filename = new_path._cwd .. new_path._sep .. new_path.filename
+    end
+    if new_path:exists() then
+      error("File or directory already exists!")
+    end
+    uv.fs_rename(self.filename, new_path.filename)
+  end
+
   local cwd = Path:new(fn.expand("%:p"))
+
   if not cwd:is_dir() or fn.bufname() == "" then
     return
   end
-  cwd.filename = cwd:absolute()
 
   if vim.bo.buftype ~= "" and vim.b.filittle_prev_filetype ~= "filittle" then
     return
@@ -64,12 +90,11 @@ M.init = function()
 
   local paths = vim.tbl_map(function(path)
     path = Path:new(path)
-    local filename = path:_name()
-    path._unresolved = cwd.filename .. filename
-    path.display = path:is_dir() and filename .. "/" or filename
+    local name = path:_name()
+    path.display = path:is_dir() and name .. "/" or name
     return path
   end, scan.scan_dir(
-    cwd.filename,
+    cwd._absolute,
     scan_opt
   ))
 
