@@ -1,6 +1,8 @@
 local M = {}
 
-local fn, api = vim.fn, vim.api
+local fn = vim.fn
+local api = vim.api
+local uv = vim.loop
 
 local hl = require("filittle.highlight")
 local devicons = require("filittle.devicons")
@@ -17,18 +19,25 @@ local sort = function(lhs, rhs)
   elseif not lhs:is_dir() and rhs:is_dir() then
     return false
   end
-  if lhs.filename < rhs.filename then
-    return true
-  else
-    return false
-  end
+  return lhs.filename < rhs.filename
 end
 
 M.init = function()
   local Path = require("plenary.path")
   local scan = require("plenary.scandir")
 
-  local cwd = Path:new(fn.expand("%"))
+  function Path:_name()
+    return self:make_relative(self:parent().filename)
+  end
+
+  function Path:is_link()
+    local res = uv.fs_lstat(self._unresolved)
+    if res then
+      return res.type == "link"
+    end
+  end
+
+  local cwd = Path:new(fn.expand("%:p"))
   if not cwd:is_dir() or fn.bufname() == "" then
     return
   end
@@ -55,8 +64,9 @@ M.init = function()
 
   local paths = vim.tbl_map(function(path)
     path = Path:new(path)
-    path.filename = path:make_relative(cwd.filename)
-    path.display = path:is_dir() and path.filename .. "/" or path.filename
+    local filename = path:_name()
+    path._unresolved = cwd.filename .. filename
+    path.display = path:is_dir() and filename .. "/" or filename
     return path
   end, scan.scan_dir(
     cwd.filename,
@@ -84,7 +94,7 @@ end
 
 M.shutup_netrw = function()
   if fn.exists("#FileExplorer") then
-    vim.cmd([[au! FileExplorer *]])
+    vim.cmd("au! FileExplorer *")
   end
 end
 
@@ -99,22 +109,13 @@ M.setup = function(opts)
     settings[k] = v
   end
 
-  if settings.devicons then
-    devicons.setup()
-  end
-
-  if vim.fn.has("vim_starting") == 0 then
-    M.shutup_netrw()
-  end
-
   vim.cmd([[
 augroup filittle
   au!
   au VimEnter * lua require("filittle").shutup_netrw()
   au BufEnter * lua require("filittle").init()
   au BufLeave * let b:filittle_prev_filetype = &filetype
-augroup END
-]])
+augroup END]])
 end
 
 return M

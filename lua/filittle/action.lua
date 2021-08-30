@@ -35,7 +35,7 @@ M.up = function(paths)
   if parent.filename == cwd.path.root() then
     vim.cmd("do BufEnter")
   end
-  fn.search([[\v^\V]] .. paths.icon .. old .. [[/\v$]], "c")
+  fn.search([[\v^\V]] .. paths.diricon .. old .. [[/\v$]], "c")
 end
 
 M.home = function(paths)
