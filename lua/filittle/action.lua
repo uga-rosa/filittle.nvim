@@ -25,14 +25,12 @@ end
 
 M.up = function(paths)
   local cwd = paths.cwd
-  if cwd:absolute() == cwd.path.root() then
+  if cwd.filename == cwd.path.root() then
     return
   end
   local parent = cwd:parent()
-  if parent == cwd.path.root() then
-    return
-  end
-  local old = cwd:make_relative(parent:absolute())
+  parent.filename = parent:absolute()
+  local old = cwd:make_relative(parent.filename)
   vim.cmd("e " .. parent.filename)
   if parent.filename == cwd.path.root() then
     vim.cmd("do BufEnter")
@@ -48,7 +46,7 @@ M.reload = function(_)
   if fn.bufname() == "" then
     print("No file name")
   else
-    vim.b.prev_filetype = "filittle"
+    vim.b.filittle_prev_filetype = "filittle"
     vim.cmd("e")
   end
 end

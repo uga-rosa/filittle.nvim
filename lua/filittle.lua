@@ -12,7 +12,16 @@ local settings = {
 }
 
 local sort = function(lhs, rhs)
-  return lhs:is_dir() and not rhs:is_dir()
+  if lhs:is_dir() and not rhs:is_dir() then
+    return true
+  elseif not lhs:is_dir() and rhs:is_dir() then
+    return false
+  end
+  if lhs.filename < rhs.filename then
+    return true
+  else
+    return false
+  end
 end
 
 M.init = function()
@@ -25,7 +34,7 @@ M.init = function()
   end
   cwd.filename = cwd:absolute()
 
-  if vim.bo.buftype ~= "" and vim.b.prev_filetype ~= "filittle" then
+  if vim.bo.buftype ~= "" and vim.b.filittle_prev_filetype ~= "filittle" then
     return
   end
 
@@ -46,33 +55,31 @@ M.init = function()
 
   local paths = vim.tbl_map(function(path)
     path = Path:new(path)
-    path.filename = path:make_relative(cwd:absolute())
+    path.filename = path:make_relative(cwd.filename)
     path.display = path:is_dir() and path.filename .. "/" or path.filename
     return path
   end, scan.scan_dir(
-    cwd:absolute(),
+    cwd.filename,
     scan_opt
   ))
 
   table.sort(paths, sort)
 
-  paths.icon = ""
-  if settings.devicons then
-    paths = devicons.init(paths)
-  end
+  paths.cwd = cwd
+  paths.devicons = settings.devicons
+
+  paths = devicons.init(paths)
 
   local display = vim.tbl_map(function(path)
-    return path.display
+    return type(path) == "table" and path.display or nil
   end, paths)
   api.nvim_buf_set_lines(0, 0, -1, true, display)
 
-  hl.init(paths, settings.devicons)
-
   vim.bo.modifiable = false
 
-  paths.cwd = cwd
-  paths.devicons = settings.devicons
-  mapping.init(paths, settings)
+  hl.init(paths)
+
+  mapping.init(paths, settings.mappings)
 end
 
 M.shutup_netrw = function()
@@ -101,7 +108,7 @@ augroup filittle
   au!
   au VimEnter * lua require("filittle").shutup_netrw()
   au BufEnter * lua require("filittle").init()
-  au BufLeave * let b:prev_filetype = &filetype
+  au BufLeave * let b:filittle_prev_filetype = &filetype
 augroup END
 ]])
 end

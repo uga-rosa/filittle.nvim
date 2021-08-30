@@ -15,18 +15,21 @@ M.setup = function()
 end
 
 M.init = function(paths)
+  if not paths.devicons then
+    paths.icon = ""
+    return paths
+  end
   for _, path in ipairs(paths) do
+    local icon, hlname
     if path:is_dir() then
-      local icon, hlname = Devicons.get_icon("filittle_dir", "")
-      path.display = string.format("%s %s", icon, path.display)
-      path.hlname = hlname
+      icon, hlname = Devicons.get_icon("filittle_dir", "")
     else
-      local obj = path.display
-      local ext = obj:match("%.(%w-)$")
-      local icon, hlname = Devicons.get_icon(obj, ext, { default = true })
-      path.display = string.format("%s %s", icon, path.display)
-      path.hlname = hlname
+      local filename = path.display
+      local ext = filename:match("%.(%w-)$")
+      icon, hlname = Devicons.get_icon(filename, ext, { default = true })
     end
+    path.display = string.format("%s %s", icon, path.display)
+    path.hlname = hlname
   end
   paths.icon = Devicons.get_icon("filittle_dir", "") .. " "
   return paths

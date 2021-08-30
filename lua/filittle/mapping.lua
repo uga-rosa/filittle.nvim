@@ -37,9 +37,8 @@ local lua2rhs = function(func, paths)
   return string.format("<cmd>lua _G._filittle_[%d]()<cr>", idx)
 end
 
-M.init = function(paths, settings)
-  local map = settings.mappings
-  for lhs, func in pairs(map) do
+M.init = function(paths, mappings)
+  for lhs, func in pairs(mappings) do
     local rhs = lua2rhs(func, paths)
     if rhs then
       api.nvim_buf_set_keymap(0, "n", lhs, rhs, { noremap = true, nowait = true })

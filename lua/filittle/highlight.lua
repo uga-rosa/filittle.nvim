@@ -2,11 +2,11 @@ local M = {}
 
 local api = vim.api
 
-M.init = function(paths, devicons)
+M.init = function(paths)
   local ns = api.nvim_create_namespace("filittle")
   api.nvim_buf_clear_namespace(0, ns, 0, -1)
 
-  if devicons then
+  if paths.devicons then
     local ICON_WIDTH = #require("nvim-web-devicons").get_icon("", "", { default = true })
     for i, path in ipairs(paths) do
       local col_end = path:is_dir() and -1 or ICON_WIDTH
