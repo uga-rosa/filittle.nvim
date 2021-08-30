@@ -34,7 +34,7 @@ local lua2rhs = function(func, paths)
       func(paths)
     end
   end
-  return string.format("<cmd>lua _G._filittle_[%d]()<cr>", idx)
+  return string.format("<cmd>lua _G._filittle_(%d)<cr>", idx)
 end
 
 M.init = function(paths, mappings)

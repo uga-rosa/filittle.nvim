@@ -89,7 +89,11 @@ M.shutup_netrw = function()
 end
 
 M.setup = function(opts)
-  _G._filittle_ = setmetatable({}, { __index = table })
+  _G._filittle_ = setmetatable({}, {
+    __call = function(self, num)
+      return self[num]()
+    end,
+  })
   opts = opts or {}
   for k, v in pairs(opts) do
     settings[k] = v
