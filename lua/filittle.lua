@@ -117,12 +117,6 @@ M.init = function()
   mapping.init(paths, settings.mappings)
 end
 
-M.shutup_netrw = function()
-  if fn.exists("#FileExplorer") then
-    vim.cmd("au! FileExplorer *")
-  end
-end
-
 M.setup = function(opts)
   _G._filittle_ = setmetatable({}, {
     __call = function(self, num)
@@ -133,14 +127,6 @@ M.setup = function(opts)
   for k, v in pairs(opts) do
     settings[k] = v
   end
-
-  vim.cmd([[
-augroup filittle
-  au!
-  au VimEnter * lua require("filittle").shutup_netrw()
-  au BufEnter * lua require("filittle").init()
-  au BufLeave * let b:filittle_prev_filetype = &filetype
-augroup END]])
 end
 
 return M
