@@ -30,6 +30,7 @@ M.up = function(opts)
   end
   local parent = cwd._parent
   local old = cwd._name
+  vim.b.filittle_prev_filetype = "filittle"
   vim.cmd("e " .. parent)
   if parent == cwd.path.root then
     vim.cmd("do BufEnter")
