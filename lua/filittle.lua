@@ -23,13 +23,17 @@ local sort = function(lhs, rhs)
 end
 
 M.init = function()
-  local cwd = Path:new(fn.expand("%:p"))
-
-  if not cwd:is_dir() or fn.bufname() == "" then
+  if fn.bufname() == "" then
     return
   end
 
   if vim.bo.buftype ~= "" and vim.b.filittle_prev_filetype ~= "filittle" then
+    return
+  end
+
+  local cwd = Path:new(fn.expand("%:p"))
+
+  if not cwd:is_dir() then
     return
   end
 
