@@ -27,6 +27,8 @@ local Path = {
   path = path,
 }
 
+Path.__index = Path
+
 --@param pathname string (fullpath)
 function Path:new(pathname)
   pathname = pathname:gsub(path.sep .. "$", "")
@@ -70,6 +72,10 @@ end
 
 function Path:is_dir()
   return self:type() == "directory"
+end
+
+function Path:is_link()
+  return self:ltype() == "link"
 end
 
 function Path:mkdir()

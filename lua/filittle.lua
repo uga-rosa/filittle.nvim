@@ -42,7 +42,15 @@ M.init = function()
   vim.opt_local.swapfile = false
 
   local hidden = vim.g.filittle_show_hidden or vim.b.filittle_show_hidden
-  local paths = cwd:scandir(hidden)
+  local paths = vim.tbl_map(function(path)
+    path.display = path._name
+    if path:is_dir() then
+      path.display = path.display .. "/"
+    end
+    return path
+  end, cwd:scandir(
+    hidden
+  ))
 
   table.sort(paths, sort)
 
