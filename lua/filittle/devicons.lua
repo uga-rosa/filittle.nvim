@@ -2,12 +2,12 @@ local M = {}
 
 local Devicons = require("nvim-web-devicons")
 
-M.init = function(paths)
-  if not paths.devicons then
-    paths.diricon = ""
-    return paths
+M.init = function(opts)
+  if not opts.devicons then
+    opts.diricon = ""
+    return opts
   end
-  for _, path in ipairs(paths) do
+  for _, path in ipairs(opts.paths) do
     local icon, hlname
     if path:is_dir() then
       icon = ""
@@ -19,8 +19,8 @@ M.init = function(paths)
     path.display = string.format("%s %s", icon, path.display)
     path.hlname = hlname
   end
-  paths.diricon = " "
-  return paths
+  opts.diricon = " "
+  return opts
 end
 
 return M

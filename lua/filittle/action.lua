@@ -3,42 +3,42 @@ local M = {}
 local fn = vim.fn
 local cmd = vim.cmd
 
-M.open = function(paths)
-  local path = paths[tonumber(fn.line("."))]
-  cmd("e " .. path:absolute())
+M.open = function(opts)
+  local path = opts.paths[tonumber(fn.line("."))]
+  cmd("e " .. path._absolute)
 end
 
-M.split = function(paths)
-  local path = paths[tonumber(fn.line("."))]
-  cmd("sp " .. path:absolute())
+M.split = function(opts)
+  local path = opts.paths[tonumber(fn.line("."))]
+  cmd("sp " .. path._absolute)
 end
 
-M.vsplit = function(paths)
-  local path = paths[tonumber(fn.line("."))]
-  cmd("vs " .. path:absolute())
+M.vsplit = function(opts)
+  local path = opts.paths[tonumber(fn.line("."))]
+  cmd("vs " .. path._absolute)
 end
 
-M.tabedit = function(paths)
-  local path = paths[tonumber(fn.line("."))]
-  cmd("tabe " .. path:absolute())
+M.tabedit = function(opts)
+  local path = opts.paths[tonumber(fn.line("."))]
+  cmd("tabe " .. path._absolute)
 end
 
-M.up = function(paths)
-  local cwd = paths.cwd
-  if cwd._absolute == cwd.path.root() then
+M.up = function(opts)
+  local cwd = opts.cwd
+  if cwd._absolute == cwd.path.root then
     return
   end
-  local parent = cwd:parent():absolute()
-  local old = cwd:_name()
+  local parent = cwd._parent
+  local old = cwd._name
   vim.cmd("e " .. parent)
-  if parent == cwd.path.root() then
+  if parent == cwd.path.root then
     vim.cmd("do BufEnter")
   end
-  fn.search([[\v^\V]] .. paths.diricon .. old .. [[/\v$]], "c")
+  fn.search([[\v^\V]] .. opts.diricon .. old .. [[/\v$]], "c")
 end
 
-M.home = function(paths)
-  vim.cmd("e " .. paths.cwd.path.home)
+M.home = function(opts)
+  vim.cmd("e " .. opts.cwd.path.home)
 end
 
 M.reload = function(_)
@@ -55,32 +55,32 @@ M.toggle_hidden = function(_)
   M.reload()
 end
 
-M.touch = function(paths)
-  local name = fn.input("Create file: ")
-  paths.cwd:joinpath(name):touch()
-  M.reload()
-end
-
-M.mkdir = function(paths)
+M.mkdir = function(opts)
   local name = fn.input("Create directory: ")
-  paths.cwd:joinpath(name):mkdir()
+  opts.cwd:joinpath(name):mkdir()
   M.reload()
 end
 
-M.delete = function(paths)
-  local path = paths[tonumber(fn.line("."))]
+M.touch = function(opts)
+  local name = fn.input("Create file: ")
+  opts.cwd:joinpath(name):touch()
+  M.reload()
+end
+
+M.delete = function(opts)
+  local path = opts.paths[tonumber(fn.line("."))]
   local conf = fn.confirm("Delete?: " .. path.filename, "&Yes\n&No", 2)
   if conf == 2 then
     return
   end
-  path:_rm(path:is_dir() and { recursive = true } or {})
+  path:delete()
   M.reload()
 end
 
-M.rename = function(paths)
-  local old = paths[fn.line(".")]
-  local new = fn.input("Rename: ", old:_name())
-  old:_rename({ new_name = new })
+M.rename = function(opts)
+  local old = opts.paths[tonumber(fn.line("."))]
+  local new = fn.input("Rename: ", old._name)
+  old:rename(new)
   M.reload()
 end
 

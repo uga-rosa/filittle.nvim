@@ -2,8 +2,8 @@ local M = {}
 
 local fn = vim.fn
 local api = vim.api
-local uv = vim.loop
 
+local Path = require("filittle.path")
 local hl = require("filittle.highlight")
 local devicons = require("filittle.devicons")
 local mapping = require("filittle.mapping")
@@ -23,46 +23,6 @@ local sort = function(lhs, rhs)
 end
 
 M.init = function()
-  local Path = require("plenary.path")
-  local scan = require("plenary.scandir")
-
-  function Path:_name()
-    return self.filename:match(("([^%s]+)%s?$"):format(self._sep, self._sep))
-  end
-
-  function Path:is_link()
-    local res = uv.fs_lstat(self.filename)
-    if res then
-      return res.type == "link"
-    end
-  end
-
-  function Path:_rm(opts)
-    if self:is_link() then
-      uv.fs_unlink(self.filename)
-    else
-      self:rm(opts)
-    end
-  end
-
-  function Path:_rename(opts)
-    opts = opts or {}
-    if not opts.new_name or opts.new_name == "" then
-      error("Please provide the new name!")
-    end
-    if opts.new_name:match("^%.%.?/?\\?") then
-      error("Invalid file name: " .. opts.new_name)
-    end
-    local new_path = Path:new(opts.new_name)
-    if not new_path:is_absolute() then
-      new_path.filename = new_path._cwd .. new_path._sep .. new_path.filename
-    end
-    if new_path:exists() then
-      error("File or directory already exists!")
-    end
-    uv.fs_rename(self.filename, new_path.filename)
-  end
-
   local cwd = Path:new(fn.expand("%:p"))
 
   if not cwd:is_dir() or fn.bufname() == "" then
@@ -81,40 +41,28 @@ M.init = function()
   vim.opt_local.wrap = false
   vim.opt_local.swapfile = false
 
-  local scan_opt = {
-    hidden = vim.g.filittle_show_hidden or vim.b.filittle_show_hidden,
-    add_dirs = true,
-    depth = 1,
-    silent = true,
-  }
-
-  local paths = vim.tbl_map(function(path)
-    path = Path:new(path)
-    local name = path:_name()
-    path.display = path:is_dir() and name .. "/" or name
-    return path
-  end, scan.scan_dir(
-    cwd._absolute,
-    scan_opt
-  ))
+  local hidden = vim.g.filittle_show_hidden or vim.b.filittle_show_hidden
+  local paths = cwd:scandir(hidden)
 
   table.sort(paths, sort)
 
-  paths.cwd = cwd
-  paths.devicons = settings.devicons
+  local opts = {}
+  opts.paths = paths
+  opts.cwd = cwd
+  opts.devicons = settings.devicons
 
-  paths = devicons.init(paths)
+  opts = devicons.init(opts)
 
   local display = vim.tbl_map(function(path)
-    return type(path) == "table" and path.display or nil
-  end, paths)
+    return path.display
+  end, opts.paths)
   api.nvim_buf_set_lines(0, 0, -1, true, display)
 
   vim.bo.modifiable = false
 
-  hl.init(paths)
+  hl.init(opts)
 
-  mapping.init(paths, settings.mappings)
+  mapping.init(opts, settings.mappings)
 end
 
 M.setup = function(opts)

@@ -7,7 +7,6 @@ Note: filittle.nvim doesn't provide default mappings.
 ## Required
 
 - neovim 0.5+
-- [plenary.nvim](https://github.com/nvim-lua/plenary.nvim)
 - [nvim-web-devicons](https://github.com/kyazdani42/nvim-web-devicons) (optional)
 
 ## Usage
