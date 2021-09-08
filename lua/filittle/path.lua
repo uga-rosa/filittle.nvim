@@ -31,7 +31,9 @@ Path.__index = Path
 
 --@param pathname string (fullpath)
 function Path:new(pathname)
-  pathname = pathname:gsub(path.sep .. "$", "")
+  if pathname ~= path.root and vim.endswith(pathname, path.sep) then
+    pathname = pathname:sub(1, -2)
+  end
   local last_sep = -pathname:reverse():find(path.sep)
   local parent = pathname:sub(1, last_sep)
   local name = pathname:sub(last_sep + 1)
@@ -131,10 +133,13 @@ function Path:rename(newname)
 end
 
 function Path:joinpath(name)
+  if self.filename == self.path.root then
+    return Path:new(self.filename .. name)
+  end
   return Path:new(self.filename .. self._sep .. name)
 end
 
-function Path:scandir(hidden)
+function Path:scandir(show_hidden)
   local data = {}
   local fd = uv.fs_scandir(self.filename)
   if fd then
@@ -143,7 +148,7 @@ function Path:scandir(hidden)
       if not name then
         break
       end
-      if not (hidden and name:sub(1, 1) == ".") then
+      if show_hidden or name:sub(1, 1) ~= "." then
         data[#data + 1] = self:joinpath(name)
       end
     end

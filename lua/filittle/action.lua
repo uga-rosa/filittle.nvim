@@ -31,10 +31,7 @@ M.up = function(opts)
   local parent = cwd._parent
   local old = cwd._name
   vim.cmd("e " .. parent)
-  M.reload()
-  if parent == cwd.path.root then
-    vim.cmd("do BufEnter")
-  end
+  vim.cmd("do BufEnter")
   fn.search([[\v^\V]] .. opts.diricon .. old .. [[/\v$]], "c")
 end
 
