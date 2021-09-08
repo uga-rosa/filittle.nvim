@@ -121,14 +121,14 @@ function Path:rename(newname)
   if not newname then
     error("No new name.")
   end
-  local newpath = self._parent .. newname
-  if Path.exists(newpath) then
+  local newpath = Path:new(self._parent .. newname)
+  if newpath:exists() then
     error("Already exists: " .. newpath)
   end
-  if vim.fn.rename(self.filename, newpath) == 0 then
+  if vim.fn.rename(self.filename, newpath.filename) == 0 then
     return true
   else
-    error(("Couldn't rename from: %s, to: %s"):format(self.filename, newpath))
+    error(("Couldn't rename from: %s, to: %s"):format(self.filename, newpath.filename))
   end
 end
 
