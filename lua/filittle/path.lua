@@ -27,8 +27,6 @@ local Path = {
   path = path,
 }
 
-Path.__index = Path
-
 --@param pathname string (fullpath)
 function Path:new(pathname)
   if pathname ~= path.root and vim.endswith(pathname, path.sep) then
@@ -43,7 +41,9 @@ function Path:new(pathname)
     _absolute = uv.fs_realpath(pathname),
     _parent = parent,
     _name = name,
-  }, Path)
+  }, {
+    __index = Path,
+  })
 end
 
 function Path:_stat()
