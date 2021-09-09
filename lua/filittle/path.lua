@@ -60,14 +60,14 @@ end
 
 function Path:type()
   if not self:exists() then
-    print("invalid path: " .. self.filename)
+    return
   end
   return self:_stat().type
 end
 
 function Path:ltype()
   if not self:exists() then
-    print("invalid path: " .. self.filename)
+    return
   end
   return self:_lstat().type
 end
