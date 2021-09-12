@@ -74,7 +74,7 @@ end
 M.delete = function(opts)
   local path = opts.paths[tonumber(fn.line("."))]
   local conf = fn.confirm("Delete?: " .. path.filename, "&Yes\n&No", 2)
-  if conf == 2 then
+  if conf == 0 or conf == 2 then
     return
   end
   path:delete()
