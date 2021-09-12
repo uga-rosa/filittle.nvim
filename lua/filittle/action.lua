@@ -55,12 +55,18 @@ end
 
 M.mkdir = function(opts)
   local name = fn.input("Create directory: ")
+  if not name or name == "" then
+    return
+  end
   opts.cwd:joinpath(name):mkdir()
   M.reload()
 end
 
 M.touch = function(opts)
   local name = fn.input("Create file: ")
+  if not name or name == "" then
+    return
+  end
   opts.cwd:joinpath(name):touch()
   M.reload()
 end
@@ -78,6 +84,9 @@ end
 M.rename = function(opts)
   local old = opts.paths[tonumber(fn.line("."))]
   local new = fn.input("Rename: ", old._name)
+  if not new or new == "" or new == old._name then
+    return
+  end
   old:rename(new)
   M.reload()
 end
