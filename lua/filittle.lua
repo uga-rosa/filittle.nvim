@@ -57,7 +57,7 @@ M.init = function()
   vim.opt_local.wrap = false
   vim.opt_local.swapfile = false
 
-  local hidden = default_config.show_hidden or _G._filittle_.show_hidden
+  local hidden = default_config.show_hidden or vim.w.filittle_show_hidden
   local paths = vim.tbl_map(function(path)
     path.display = path._name
     if path:is_dir() then
@@ -99,12 +99,6 @@ M.setup = function(opts)
   for k, v in pairs(opts) do
     default_config[k] = v
   end
-
-  _G._filittle_ = setmetatable({}, {
-    __call = function(self, num)
-      return self[num]()
-    end,
-  })
 
   vim.cmd([[
 augroup filittle

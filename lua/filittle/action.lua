@@ -10,24 +10,25 @@ end
 M.open = function(opts)
   local path = opts.paths[tonumber(fn.line("."))]
   cmd("e " .. path._absolute)
-  if path:is_dir() then
-    M.reload()
-  end
+  M.reload()
 end
 
 M.split = function(opts)
   local path = opts.paths[tonumber(fn.line("."))]
   cmd("sp " .. path._absolute)
+  M.reload()
 end
 
 M.vsplit = function(opts)
   local path = opts.paths[tonumber(fn.line("."))]
   cmd("vs " .. path._absolute)
+  M.reload()
 end
 
 M.tabedit = function(opts)
   local path = opts.paths[tonumber(fn.line("."))]
   cmd("tabe " .. path._absolute)
+  M.reload()
 end
 
 M.up = function(opts)
@@ -48,7 +49,7 @@ M.home = function(opts)
 end
 
 M.toggle_hidden = function(_)
-  _G._filittle_.show_hidden = _G._filittle_.show_hidden
+  vim.w.filittle_show_hidden = not vim.w.filittle_show_hidden
   M.reload()
 end
 

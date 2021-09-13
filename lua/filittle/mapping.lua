@@ -38,6 +38,12 @@ local lua2rhs = function(func, opts)
 end
 
 M.init = function(opts, mappings)
+  _G._filittle_ = setmetatable({}, {
+    __call = function(self, num)
+      return self[num]()
+    end,
+  })
+
   for lhs, func in pairs(mappings) do
     local rhs = lua2rhs(func, opts)
     if rhs then
