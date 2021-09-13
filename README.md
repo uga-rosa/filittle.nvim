@@ -2,8 +2,6 @@
 
 A simple and fast file explorer for neovim written in Lua (optional support for devicons).
 
-Note: filittle.nvim doesn't provide default mappings.
-
 ## Required
 
 - neovim 0.5+
@@ -18,15 +16,18 @@ Of cource, you can also use `<C-o>` and `<C-i>` to jump.
 ## Setup
 
 Option to set it up.
-- devicons: boolen (whether to enable nvim-web-devicons)
+- devicons: If true, use devicons.
+- disable_mapping: if true, default mappings are disabled.
 - mappings: table (key: lhs, value: a built-in function or a function defined by you)
+- show_hidden: if true, hidden files/directories will always be displayed.
 
 The built-in function can be specified as a string. [See here](#buitlin-function)
 
-Exanple
+Default config
 ```lua
 require("filittle").setup({
-  devicons = true,
+  devicons = false,
+  disable_mapping = false,
   mappings = {
     ["<cr>"] = "open",
     ["l"] = "open",
@@ -42,6 +43,7 @@ require("filittle").setup({
     ["d"] = "delete",
     ["r"] = "rename",
   },
+  show_hidden = false,
 })
 ```
 
@@ -51,19 +53,11 @@ require("filittle").setup({
 - `split`: Open in split window.
 - `vsplit`: Open in vertical split window.
 - `tabedit`: Open in new tab.
-- `reload`: Redraw the screen.
 - `up`: Move to parent directory.
 - `home`: Move to home directory (like `cd ~`).
 - `toggle_hidden`: Toggles the display of hidden files.
+- `reload`: Redraw the screen.
 - `touch`: Create a new file.
 - `mkdir`: Create a new directory.
 - `delete`: Delete a file or directory
 - `rename`: Rename a file or directory
-
-## Global options
-
-- Always show hidden files.
-
-```lua
-vim.g.filittle_show_hidden = true -- Anything but false or nil
-```

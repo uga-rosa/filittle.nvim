@@ -3,9 +3,14 @@ local M = {}
 local fn = vim.fn
 local cmd = vim.cmd
 
+M.reload = function()
+  cmd("do User filittle")
+end
+
 M.open = function(opts)
   local path = opts.paths[tonumber(fn.line("."))]
   cmd("e " .. path._absolute)
+  M.reload()
 end
 
 M.split = function(opts)
@@ -30,8 +35,8 @@ M.up = function(opts)
   end
   local parent = cwd._parent
   local old = cwd._name
-  vim.cmd("e " .. parent)
-  vim.cmd("do BufEnter")
+  cmd("e " .. parent)
+  M.reload()
   fn.search([[\v^\V]] .. opts.diricon .. old .. [[/\v$]], "c")
 end
 
@@ -39,17 +44,8 @@ M.home = function(opts)
   vim.cmd("e " .. opts.cwd.path.home)
 end
 
-M.reload = function(_)
-  if fn.bufname() == "" then
-    print("No file name")
-  else
-    vim.b.filittle_prev_filetype = "filittle"
-    vim.cmd("e")
-  end
-end
-
 M.toggle_hidden = function(_)
-  vim.b.filittle_show_hidden = not vim.b.filittle_show_hidden
+  _G._filittle_.show_hidden = _G._filittle_.show_hidden
   M.reload()
 end
 

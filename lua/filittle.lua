@@ -8,9 +8,25 @@ local hl = require("filittle.highlight")
 local devicons = require("filittle.devicons")
 local mapping = require("filittle.mapping")
 
-local settings = {
-  devicons = false,
-  mappings = {},
+local default_config = {
+  devicons = true,
+  disable_mapping = false,
+  mappings = {
+    ["<cr>"] = "open",
+    ["l"] = "open",
+    ["<C-x>"] = "split",
+    ["<C-v>"] = "vsplit",
+    ["<C-t>"] = "tabedit",
+    ["h"] = "up",
+    ["~"] = "home",
+    ["R"] = "reload",
+    ["+"] = "toggle_hidden",
+    ["t"] = "touch",
+    ["m"] = "mkdir",
+    ["d"] = "delete",
+    ["r"] = "rename",
+  },
+  show_hidden = false,
 }
 
 local sort = function(lhs, rhs)
@@ -24,10 +40,6 @@ end
 
 M.init = function()
   if fn.bufname() == "" then
-    return
-  end
-
-  if vim.bo.buftype ~= "" and vim.b.filittle_prev_filetype ~= "filittle" then
     return
   end
 
@@ -45,7 +57,7 @@ M.init = function()
   vim.opt_local.wrap = false
   vim.opt_local.swapfile = false
 
-  local hidden = vim.g.filittle_show_hidden or vim.b.filittle_show_hidden
+  local hidden = default_config.show_hidden or _G._filittle_.show_hidden
   local paths = vim.tbl_map(function(path)
     path.display = path._name
     if path:is_dir() then
@@ -61,7 +73,7 @@ M.init = function()
   local opts = {}
   opts.paths = paths
   opts.cwd = cwd
-  opts.devicons = settings.devicons
+  opts.devicons = default_config.devicons
 
   opts = devicons.init(opts)
 
@@ -74,18 +86,39 @@ M.init = function()
 
   hl.init(opts)
 
-  mapping.init(opts, settings.mappings)
+  mapping.init(opts, default_config.mappings)
 end
 
 M.setup = function(opts)
+  opts = opts or {}
+
+  if opts.disable_mapping then
+    default_config.mappings = {}
+  end
+
+  for k, v in pairs(opts) do
+    default_config[k] = v
+  end
+
   _G._filittle_ = setmetatable({}, {
     __call = function(self, num)
       return self[num]()
     end,
   })
-  opts = opts or {}
-  for k, v in pairs(opts) do
-    settings[k] = v
+
+  vim.cmd([[
+augroup filittle
+  au!
+  au VimEnter * lua require("filittle").shutup_netrw()
+  au BufEnter * lua require("filittle").init()
+  au User filittle lua require("filittle").init()
+augroup END
+  ]])
+end
+
+M.shutup_netrw = function()
+  if fn.exists("#FileExplorer") == 1 then
+    vim.cmd("au! FileExplorer *")
   end
 end
 
