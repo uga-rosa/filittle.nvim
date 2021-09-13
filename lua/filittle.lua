@@ -114,6 +114,9 @@ augroup filittle
   au User filittle lua require("filittle").init()
 augroup END
   ]])
+
+  -- for lazy loading
+  M.shutup_netrw()
 end
 
 M.shutup_netrw = function()
