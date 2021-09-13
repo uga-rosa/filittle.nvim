@@ -10,7 +10,9 @@ end
 M.open = function(opts)
   local path = opts.paths[tonumber(fn.line("."))]
   cmd("e " .. path._absolute)
-  M.reload()
+  if path:is_dir() then
+    M.reload()
+  end
 end
 
 M.split = function(opts)
@@ -42,6 +44,7 @@ end
 
 M.home = function(opts)
   vim.cmd("e " .. opts.cwd.path.home)
+  M.reload()
 end
 
 M.toggle_hidden = function(_)
