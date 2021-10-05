@@ -25,9 +25,8 @@ The built-in function can be specified as a string. [See here](#buitlin-function
 
 Default config
 ```lua
-require("filittle").setup({
-  devicons = false,
-  disable_mapping = false,
+local default_config = {
+  devicons = true,
   mappings = {
     ["<cr>"] = "open",
     ["l"] = "open",
@@ -44,7 +43,7 @@ require("filittle").setup({
     ["r"] = "rename",
   },
   show_hidden = false,
-})
+}
 ```
 
 ## Buitlin function
