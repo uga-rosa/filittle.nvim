@@ -15,10 +15,6 @@ Of cource, you can also use `<C-o>` and `<C-i>` to jump.
 
 ## Setup
 
-```lua
-require("filittle").setup()
-```
-
 Option to set it up.
 - devicons: If true, use devicons.
 - disable_mapping: if true, default mappings are disabled.

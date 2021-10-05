@@ -10,7 +10,6 @@ local mapping = require("filittle.mapping")
 
 local default_config = {
   devicons = true,
-  disable_mapping = false,
   mappings = {
     ["<cr>"] = "open",
     ["l"] = "open",
@@ -98,24 +97,6 @@ M.setup = function(opts)
 
   for k, v in pairs(opts) do
     default_config[k] = v
-  end
-
-  vim.cmd([[
-augroup filittle
-  au!
-  au VimEnter * lua require("filittle").shutup_netrw()
-  au BufEnter * lua require("filittle").init()
-  au User filittle lua require("filittle").init()
-augroup END
-  ]])
-
-  -- for lazy loading
-  M.shutup_netrw()
-end
-
-M.shutup_netrw = function()
-  if fn.exists("#FileExplorer") == 1 then
-    vim.cmd("au! FileExplorer *")
   end
 end
 
