@@ -15,17 +15,26 @@ Of cource, you can also use `<C-o>` and `<C-i>` to jump.
 
 ## Setup
 
+```lua
+local options = {
+  -- your config
+}
+require("filittle").setup(options)
+```
+
 Option to set it up.
-- devicons: If true, use devicons.
-- disable_mapping: if true, default mappings are disabled.
-- mappings: table (key: lhs, value: a built-in function or a function defined by you)
-- show_hidden: if true, hidden files/directories will always be displayed.
+- `devicons`: If true, use devicons.
+- `disable_mapping`: if true, default mappings are disabled.
+- `mappings`: table (key: lhs, value: a built-in function or a function defined by you)
+- `show_hidden`: if true, hidden files/directories will always be displayed.
 
 The built-in function can be specified as a string. [See here](#buitlin-function)
 
-Default config
+There is no need to call setup if you are using the default settings.
+
+Default settings
 ```lua
-local default_config = {
+local default_settigns = {
   devicons = true,
   mappings = {
     ["<cr>"] = "open",

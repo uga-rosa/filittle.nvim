@@ -8,7 +8,7 @@ local hl = require("filittle.highlight")
 local devicons = require("filittle.devicons")
 local mapping = require("filittle.mapping")
 
-local default_config = {
+local default_settings = {
   devicons = true,
   mappings = {
     ["<cr>"] = "open",
@@ -56,7 +56,7 @@ M.init = function()
   vim.opt_local.wrap = false
   vim.opt_local.swapfile = false
 
-  local hidden = default_config.show_hidden or vim.w.filittle_show_hidden
+  local hidden = default_settings.show_hidden or vim.w.filittle_show_hidden
   local paths = vim.tbl_map(function(path)
     path.display = path._name
     if path:is_dir() then
@@ -72,7 +72,7 @@ M.init = function()
   local opts = {}
   opts.paths = paths
   opts.cwd = cwd
-  opts.devicons = default_config.devicons
+  opts.devicons = default_settings.devicons
 
   opts = devicons.init(opts)
 
@@ -85,18 +85,18 @@ M.init = function()
 
   hl.init(opts)
 
-  mapping.init(opts, default_config.mappings)
+  mapping.init(opts, default_settings.mappings)
 end
 
 M.setup = function(opts)
   opts = opts or {}
 
   if opts.disable_mapping then
-    default_config.mappings = {}
+    default_settings.mappings = {}
   end
 
   for k, v in pairs(opts) do
-    default_config[k] = v
+    default_settings[k] = v
   end
 end
 
