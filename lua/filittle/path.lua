@@ -27,7 +27,6 @@ local Path = {
   path = path,
 }
 
---@param pathname string (fullpath)
 function Path:new(pathname)
   if pathname ~= path.root and vim.endswith(pathname, path.sep) then
     pathname = pathname:sub(1, -2)
